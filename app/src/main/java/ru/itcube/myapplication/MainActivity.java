@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -36,6 +37,15 @@ public class MainActivity extends AppCompatActivity {
 
         GoodsAdapter adapter = new GoodsAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, goods);
         listView.setAdapter(adapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Good good = goods.get(position);
+                Intent intent = new Intent(getApplicationContext(), GoodActivity.class);
+                intent.putExtra("good", good);
+                startActivity(intent);
+            }
+        });
     }
 
     private List<Good> generateGoods() {

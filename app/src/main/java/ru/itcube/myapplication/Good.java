@@ -1,8 +1,9 @@
 package ru.itcube.myapplication;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class Good {
+public class Good implements Serializable {
     private String title;
     private BigDecimal price;
     private String image;
