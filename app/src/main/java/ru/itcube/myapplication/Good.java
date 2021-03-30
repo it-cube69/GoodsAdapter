@@ -8,6 +8,12 @@ public class Good implements Serializable {
     private BigDecimal price;
     private String image;
 
+    public Good(String title, BigDecimal price, String image) {
+        this.title = title;
+        this.price = price;
+        this.image = image;
+    }
+
     public String getTitle() {
         return title;
     }

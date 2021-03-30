@@ -1,13 +1,10 @@
 package ru.itcube.myapplication;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +13,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -34,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
 
         List<Good> goods = generateGoods();
 
-
         GoodsAdapter adapter = new GoodsAdapter(getApplicationContext(), android.R.layout.simple_list_item_1, goods);
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -51,30 +50,32 @@ public class MainActivity extends AppCompatActivity {
     private List<Good> generateGoods() {
         List<Good> goods = new ArrayList<>();
 
-        Good milk = new Good();
-        milk.setTitle("Milk");
-        milk.setPrice(new BigDecimal(65).setScale(2));
-        milk.setImage("milk");
+        SQLiteDatabase sqLiteDatabase = openOrCreateDatabase("goods", MODE_PRIVATE, null);
+        sqLiteDatabase.execSQL("create table if not exists goods\n" +
+                "(\n" +
+                "\ttitle varchar(1000),\n" +
+                "\tprice int,\n" +
+                "\timage varchar(1000)\n" +
+                ");");
 
-        Good bread = new Good();
-        bread.setTitle("Bread");
-        bread.setPrice(new BigDecimal(40).setScale(2));
-        bread.setImage("bread");
+        sqLiteDatabase.execSQL("insert into goods(title,price,image) values('Milk',65,'milk')");
+        sqLiteDatabase.execSQL("insert into goods(title,price,image) values('Bread',40,'bread')");
+        sqLiteDatabase.execSQL("insert into goods(title,price,image) values('Cheese',800,'cheese')");
+        sqLiteDatabase.execSQL("insert into goods(title,price,image) values('Eggs',60,'eggs')");
 
-        Good cheese = new Good();
-        cheese.setTitle("Cheese");
-        cheese.setPrice(new BigDecimal(800).setScale(2));
-        cheese.setImage("cheese");
+        Cursor c = sqLiteDatabase.rawQuery("select title,price,image from goods", null);
+        int titleIndex = c.getColumnIndex("title");
+        int priceIndex = c.getColumnIndex("price");
+        int imageIndex = c.getColumnIndex("image");
+        c.moveToFirst();
+        while (!c.isAfterLast()) {
+            Good good = new Good(c.getString(titleIndex),
+                    new BigDecimal(c.getLong(priceIndex)).setScale(2),
+                    c.getString(imageIndex));
+            goods.add(good);
+            c.moveToNext();
+        }
 
-        Good eggs = new Good();
-        eggs.setTitle("Eggs");
-        eggs.setPrice(new BigDecimal(60).setScale(2));
-        eggs.setImage("eggs");
-
-        goods.add(bread);
-        goods.add(eggs);
-        goods.add(milk);
-        goods.add(cheese);
         return goods;
     }
 
